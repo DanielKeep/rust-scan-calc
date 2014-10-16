@@ -1,0 +1,17 @@
+[package]
+
+name = "scan_calc"
+version = "0.0.1"
+authors = ["Daniel Keep <daniel.keep@gmail.com>"]
+
+[[bin]]
+
+name = "scan-calc"
+
+[dependencies.scan]
+
+git = "https://github.com/DanielKeep/rust-scan.git"
+
+[dependencies.scan_util]
+
+git = "https://github.com/DanielKeep/rust-scan-util.git"
