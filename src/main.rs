@@ -1,10 +1,13 @@
+/*!
+This crate implements a simple arithmetic calculator, using the [`rust-scan`](https://github.com/DanielKeep/rust-scan.git) package to do the parsing.
+*/
 #![feature(phase)]
 
 #[phase(plugin)] extern crate scan;
 extern crate scan_util;
 
 use std::collections::HashMap;
-use scan_util::{NothingMatched, OtherScanError, ScanIoError};
+use scan_util::{OtherScanError, ScanIoError};
 
 fn main() {
 	let mut vars = HashMap::new();
@@ -36,25 +39,20 @@ fn main() {
     		},
 
     		// Fallback for unknown commands.
-    		"." cmd:&str, .._ignore => {
+			"." cmd:&str, .._ => {
     			println!("error: unknown command `{}`", cmd);
     			println!("Try `.help`.");
     			continue;
     		},
 
     		// Ignore empty lines.
-    		_ignore:() => continue,
+			_:() => continue,
 
     		// Otherwise, try to scan a statement.
     		stmt:Stmt => stmt,
     	};
 
     	let stmt = match res {
-    		Err(NothingMatched) => {
-    			println!("error: sorry, I didn't understand that.");
-    			println!("Try `.help`.");
-    			continue;
-    		},
     		Err(ScanIoError(err)) => {
     			println!("io error: {}", err);
     			std::os::set_exit_status(1);
@@ -79,6 +77,11 @@ fn main() {
     }
 }
 
+/**
+Evaluates an expression, returning `Some(f64)` if there were no errors.
+
+If something *does* go wrong, it will just print the error message and return `None`.  This really should be using `Result`, but I'm too lazy for that.
+*/
 fn eval(expr: Expr, vars: &HashMap<String, f64>) -> Option<f64> {
 	match expr {
 		Add(box lhs, box rhs) => eval(lhs, vars).zip(eval(rhs, vars)).map(|(l,r)| l+r),
@@ -98,6 +101,25 @@ fn eval(expr: Expr, vars: &HashMap<String, f64>) -> Option<f64> {
 	}
 }
 
+/*
+
+The trick to using scan here is to map each grammar production to a type, then implement a scanner for that type.  As results are passed back up the call stack, we "unpack" the grammar production type into the actual semantic type.
+
+This is actually something of a limitation of the `Scanner` trait; ideally, we could use UFCS (which isn't implemented yet) to have a capture like `lhs:MulExpr` which uses the scanner code defined for the `MulExpr` type, but which *results* in a `Expr` value.
+
+The grammar we're parsing is given below.  Note that it's arranged this way to encode operator precedence directly into the grammar.
+
+```{notrust}
+<expr> := <add-expr>
+<add-expr> := <mul-expr> ( ( "+" | "-" ) <add-expr> )?
+<mul-expr> := <atom-expr> ( ( "*" | "/" ) <mul-expr> )?
+<atom-expr> := "(" <add-expr> ")"
+             | <literal>
+             | <identifier>
+```
+
+*/
+
 #[deriving(PartialEq, Show)]
 enum Stmt {
 	LetStmt(String, Expr),
@@ -105,8 +127,10 @@ enum Stmt {
 }
 
 scanner! { Stmt,
+	// We need to use a different tokeniser here to ensure that `name` can be any identifier.
 	#[tokenizer="IdentsAndInts"]
 	"let" name "=" expr => LetStmt(name, expr),
+
 	expr => ExprStmt(expr),
 }
 
@@ -121,6 +145,7 @@ enum Expr {
 }
 
 scanner! { Expr,
+	// Just forward on to the corresponding grammar production: AddExpr.
 	expr:AddExpr => {
 		let AddExpr(expr) = expr;
 		expr
@@ -130,7 +155,9 @@ scanner! { Expr,
 struct AddExpr(Expr);
 
 scanner! { AddExpr,
+	// We *could* boil this down to a single arm, but it wouldn't be as neat.
 	lhs:MulExpr "+" rhs:AddExpr => {
+		// Again, we only need MulExpr and AddExpr in order to trigger the correct scanning rules.  What we actually *care* about are the Exprs inside.
 		let (MulExpr(lhs), AddExpr(rhs)) = (lhs, rhs);
 		AddExpr(Add(box lhs, box rhs))
 	},
@@ -169,10 +196,15 @@ scanner! { AtomExpr,
 		AtomExpr(expr)
 	},
 	lit => AtomExpr(Lit(lit)),
+
+	// Again, we use a different tokeniser.  Also note that it's not *entirely* correct.  This technically means we can have a variable called `*`, which means `***` is a perfectly valid expression.
 	#[tokenizer="IdentsAndInts"]
 	name => AtomExpr(Var(name)),
 }
 
+/**
+This is just a helper trait used to simplify evaluating binary expressions.
+*/
 trait ZipOption<L> {
 	fn zip<R>(self, other: Option<R>) -> Option<(L, R)>;
 }
