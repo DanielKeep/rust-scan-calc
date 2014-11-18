@@ -7,6 +7,7 @@ This crate implements a simple arithmetic calculator, using the [`rust-scan`](ht
 extern crate scan_util;
 
 use std::collections::HashMap;
+use std::num::Float;
 use scan_util::{OtherScanError, ScanIoError};
 
 fn main() {
