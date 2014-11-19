@@ -9,7 +9,7 @@ dependencies = [
 [[package]]
 name = "scan"
 version = "0.5.2"
-source = "git+https://github.com/DanielKeep/rust-scan.git#e10f59b55167ce0d863a79190f91bb4012ccd855"
+source = "git+https://github.com/DanielKeep/rust-scan.git#00fc8df04daa640adbbce1f38fe71ca38151e4d9"
 dependencies = [
  "scan_util 0.5.0 (git+https://github.com/DanielKeep/rust-scan-util.git)",
 ]
@@ -17,5 +17,5 @@ dependencies = [
 [[package]]
 name = "scan_util"
 version = "0.5.0"
-source = "git+https://github.com/DanielKeep/rust-scan-util.git#0fd2a30d2d4c3ef5b79e3ebb5b8d80235c89da87"
+source = "git+https://github.com/DanielKeep/rust-scan-util.git#d49c9115540f72aa00cd4938265b5bc98bbf9316"
 

@@ -10,6 +10,9 @@ use std::collections::HashMap;
 use std::num::Float;
 use scan_util::{OtherScanError, ScanIoError};
 
+use self::Stmt::{LetStmt, ExprStmt};
+use self::Expr::{Add, Sub, Mul, Div, Var, Lit};
+
 fn main() {
 	let mut vars = HashMap::new();
 
@@ -90,7 +93,7 @@ fn eval(expr: Expr, vars: &HashMap<String, f64>) -> Option<f64> {
 		Mul(box lhs, box rhs) => eval(lhs, vars).zip(eval(rhs, vars)).map(|(l,r)| l*r),
 		Div(box lhs, box rhs) => eval(lhs, vars).zip(eval(rhs, vars)).map(|(l,r)| l/r),
 		Var(name) => {
-			match vars.find_copy(&name) {
+			match vars.get(&name).cloned() {
 				Some(v) => Some(v),
 				None => {
 					println!("error: undefined variable `{}`.", name);
