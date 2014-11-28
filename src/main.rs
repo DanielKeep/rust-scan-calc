@@ -63,7 +63,7 @@ fn main() {
     			return;
     		},
     		Err(err @ OtherScanError(..)) => {
-    			println!("error: {:s}", err);
+    			println!("error: {}", err);
     			continue;
     		},
     		Ok(stmt) => stmt,
