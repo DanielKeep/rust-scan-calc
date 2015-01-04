@@ -6,6 +6,7 @@ This crate implements a simple arithmetic calculator, using the [`rust-scan`](ht
 #[phase(plugin)] extern crate scan;
 extern crate scan_util;
 
+use std::borrow::ToOwned;
 use std::collections::HashMap;
 use std::num::Float;
 use scan_util::{OtherScanError, ScanIoError};
@@ -16,10 +17,10 @@ use self::Expr::{Add, Sub, Mul, Div, Var, Lit};
 fn main() {
 	let mut vars = HashMap::new();
 
-	vars.insert("NaN".into_string(), Float::nan());
-	vars.insert("inf".into_string(), Float::infinity());
-	vars.insert("pi".into_string(), Float::pi());
-	vars.insert("e".into_string(), Float::e());
+	vars.insert("NaN".to_owned(), Float::nan());
+	vars.insert("inf".to_owned(), Float::infinity());
+	vars.insert("pi".to_owned(), ::std::f64::consts::PI);
+	vars.insert("e".to_owned(), ::std::f64::consts::E);
 
 	println!("Type `.help` or `.h` for brief instructions.");
 	println!("Type `.quit` or `.q` to quit.");
@@ -38,7 +39,7 @@ fn main() {
 
     		// Exit.
     		".q" | ".quit" => {
-    			println!("Bye!")
+    			println!("Bye!");
     			return;
     		},
 
@@ -124,7 +125,7 @@ The grammar we're parsing is given below.  Note that it's arranged this way to e
 
 */
 
-#[deriving(PartialEq, Show)]
+#[derive(PartialEq, Show)]
 enum Stmt {
 	LetStmt(String, Expr),
 	ExprStmt(Expr),
@@ -138,7 +139,7 @@ scanner! { Stmt,
 	expr => ExprStmt(expr),
 }
 
-#[deriving(PartialEq, Show)]
+#[derive(PartialEq, Show)]
 enum Expr {
 	Add(Box<Expr>, Box<Expr>),
 	Sub(Box<Expr>, Box<Expr>),
