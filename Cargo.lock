@@ -1,21 +1,21 @@
 [root]
 name = "scan_calc"
-version = "0.5.3"
+version = "0.5.5"
 dependencies = [
- "scan 0.5.3 (git+https://github.com/DanielKeep/rust-scan.git)",
- "scan_util 0.5.4 (git+https://github.com/DanielKeep/rust-scan-util.git)",
+ "scan 0.5.5 (git+https://github.com/DanielKeep/rust-scan.git)",
+ "scan_util 0.5.5 (git+https://github.com/DanielKeep/rust-scan-util.git)",
 ]
 
 [[package]]
 name = "scan"
-version = "0.5.3"
-source = "git+https://github.com/DanielKeep/rust-scan.git#12eb7dde4fc884540efb6948f716ccc311bd6899"
+version = "0.5.5"
+source = "git+https://github.com/DanielKeep/rust-scan.git#e83f1dc40087469ae4bf7b57866a2be9152a0d95"
 dependencies = [
- "scan_util 0.5.4 (git+https://github.com/DanielKeep/rust-scan-util.git)",
+ "scan_util 0.5.5 (git+https://github.com/DanielKeep/rust-scan-util.git)",
 ]
 
 [[package]]
 name = "scan_util"
-version = "0.5.4"
-source = "git+https://github.com/DanielKeep/rust-scan-util.git#8d344e05b392644170117b1d2f4da6f72cc35623"
+version = "0.5.5"
+source = "git+https://github.com/DanielKeep/rust-scan-util.git#1a13f7841f80188d4104786f5d30fe5dd9859035"
 
